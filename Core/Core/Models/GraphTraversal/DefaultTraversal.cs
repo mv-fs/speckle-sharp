@@ -64,6 +64,7 @@ public static class DefaultTraversal
 
     return new GraphTraversal(bimElementRule, IgnoreResultsRule, DefaultRule);
   }
+  
 
   //These functions are just meant to make the syntax of defining rules less verbose, they are likely to change frequently/be restructured
   #region Helper Functions
@@ -74,7 +75,7 @@ public static class DefaultTraversal
     .When(o => o.speckle_type.Contains("Objects.Structural.Results"))
     .ContinueTraversing(None);
 
-  private static readonly ITraversalRule DefaultRule = TraversalRule
+  public static readonly ITraversalRule DefaultRule = TraversalRule
     .NewTraversalRule()
     .When(_ => true)
     .ContinueTraversing(Members());
@@ -132,7 +133,7 @@ public static class DefaultTraversal
   }
 
   [Pure]
-  internal static IEnumerable<string> None(Base _)
+  public static IEnumerable<string> None(Base _)
   {
     return Enumerable.Empty<string>();
   }

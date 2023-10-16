@@ -13,11 +13,6 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.EditorInput;
 
-#if ADVANCESTEEL2023
-using Autodesk.AdvanceSteel.DocumentManagement;
-using Autodesk.AdvanceSteel.DotNetRoots.Units;
-#endif
-
 #if CIVIL2021 || CIVIL2022 || CIVIL2023 || CIVIL2024
 using Autodesk.Aec.ApplicationServices;
 #endif
@@ -100,6 +95,11 @@ namespace Objects.Converter.AutocadCivil
     /// <returns></returns>
     public static string RemoveInvalidAutocadChars(string str)
     {
+      // TOOD: DUI3! this is temporary check since DUI3 not fully implemented!
+      if (str == null)
+      {
+        return "";
+      }
       // using this to handle rhino nested layer syntax
       // replace "::" layer delimiter with "$" (acad standard)
       string cleanDelimiter = str.Replace("::", "$");
@@ -322,23 +322,6 @@ namespace Objects.Converter.AutocadCivil
     #endregion
 
     #region units
-
-#if ADVANCESTEEL2023
-
-    private double _factor;
-    public double Factor
-    {
-      get
-      {
-        if (_factor.Equals(0.0))
-        {
-          _factor = DocumentManager.GetCurrentDocument().CurrentDatabase.Units.UnitOfDistance.Factor;
-        }
-
-        return _factor;
-      }
-    }
-#endif
 
     private string _modelUnits;
     public string ModelUnits

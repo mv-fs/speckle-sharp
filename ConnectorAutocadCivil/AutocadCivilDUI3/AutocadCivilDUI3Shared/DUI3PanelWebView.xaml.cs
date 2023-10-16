@@ -1,8 +1,9 @@
-﻿using System.Diagnostics;
 using System.Windows.Controls;
+using System.Windows.Threading;
+using AutocadCivilDUI3Shared.Bindings;
 using DUI3;
 using Microsoft.Web.WebView2.Core;
-using Speckle.ConnectorAutocadDUI3.Bindings;
+using Speckle.Core.Logging;
 
 namespace Speckle.ConnectorAutocadDUI3;
 
@@ -14,25 +15,29 @@ public partial class DUI3PanelWebView : UserControl
     Browser.CoreWebView2InitializationCompleted += Browser_Initialized_Completed;
   }
 
+  private void ShowDevToolsMethod()
+  {
+    Browser.CoreWebView2.OpenDevToolsWindow();
+  }
+
+  private void ExecuteScriptAsyncMethod(string script)
+  {
+    if (!Browser.IsInitialized)
+    {
+      throw new SpeckleException("Failed to execute script, Webview2 is not initialized yet.");
+    }
+    Browser.Dispatcher.Invoke(() => Browser.ExecuteScriptAsync(script), DispatcherPriority.Background);
+  }
+
   private void Browser_Initialized_Completed(object sender, CoreWebView2InitializationCompletedEventArgs e)
   {
-    var executeScriptAsyncMethod = (string script) => {
-      Debug.WriteLine(script);
-      Browser.ExecuteScriptAsync(script); 
-    };
+    var bindings = Factory.CreateBindings();
 
-    var showDevToolsMethod = () => Browser.CoreWebView2.OpenDevToolsWindow();
-
-    // Test bindings 1
-    var baseBindings = new BasicConnectorBindingAutocad();
-    var baseBindingsBridge = new DUI3.BrowserBridge(Browser, baseBindings, executeScriptAsyncMethod, showDevToolsMethod);
-
-    // Test bindings 2
-    var testBinding = new TestBinding();
-    var testBindingBridge = new DUI3.BrowserBridge(Browser, testBinding, executeScriptAsyncMethod, showDevToolsMethod);
-
-    Browser.CoreWebView2.AddHostObjectToScript(baseBindingsBridge.FrontendBoundName, baseBindingsBridge);
-    Browser.CoreWebView2.AddHostObjectToScript(testBindingBridge.FrontendBoundName, testBindingBridge);
+    foreach (var binding in bindings)
+    {
+      var bridge = new BrowserBridge(Browser, binding, ExecuteScriptAsyncMethod, ShowDevToolsMethod);
+      Browser.CoreWebView2.AddHostObjectToScript(binding.Name, bridge);
+    }
   }
 }
 
