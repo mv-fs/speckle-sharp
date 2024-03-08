@@ -110,6 +110,17 @@ public class BaseObjectSerializerV2
       return obj;
     }
 
+    // WIP: ! Here somehow we broke first sent closures
+    if (obj is ObjectReference reff)
+    {
+      var lastPC = _parentClosures[_parentClosures.Count - 1];
+      if (reff.__closure is not null)
+        foreach (var VARIABLE in reff.__closure)
+        {
+          lastPC[VARIABLE.Key] = VARIABLE.Value;
+        }
+    }
+
     switch (obj)
     {
       // Complex enough to deserve its own function
@@ -308,16 +319,15 @@ public class BaseObjectSerializerV2
       string json = Dict2Json(convertedBase);
       string id = (string)convertedBase["id"]!;
       StoreObject(id, json);
-      ObjectReference objRef = new() { referencedId = id }; // __closure = convertedBase["__closure"] as Dictionary<string,int> };
+      ObjectReference objRef = new() { referencedId = id };
+
+      // WIP: !
       if (convertedBase.ContainsKey("__closure") && convertedBase["applicationId"] is not null)
       {
         objRef.__closure = convertedBase["__closure"] as Dictionary<string, int>;
         _ids[convertedBase["applicationId"] as string] = objRef;
       }
-      // if (convertedBase["applicationId"] is not null)
-      // {
-      //   _ids[convertedBase["applicationId"] as string] = objRef;
-      // }
+
       var objRefConverted = (IDictionary<string, object?>?)PreserializeObject(objRef);
       UpdateParentClosures(id);
       _onProgressAction?.Invoke("S", 1);
