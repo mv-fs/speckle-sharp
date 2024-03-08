@@ -22,6 +22,7 @@ public class BaseObjectSerializerV2
   private readonly Stopwatch _stopwatch = new();
   private volatile bool _isBusy;
   private List<Dictionary<string, int>> _parentClosures = new();
+  public readonly Dictionary<string, ObjectReference> _ids = new();
   private HashSet<object> _parentObjects = new();
   private readonly Dictionary<string, List<(PropertyInfo, PropertyAttributeInfo)>> _typedPropertiesCache = new();
   private readonly Action<string, int>? _onProgressAction;
@@ -143,7 +144,13 @@ public class BaseObjectSerializerV2
       }
       case ObjectReference r:
       {
-        Dictionary<string, object> ret = new() { ["speckle_type"] = r.speckle_type, ["referencedId"] = r.referencedId };
+        Dictionary<string, object> ret =
+          new()
+          {
+            ["speckle_type"] = r.speckle_type,
+            ["referencedId"] = r.referencedId,
+            ["__closure"] = r.__closure
+          };
         return ret;
       }
       case Enum:
@@ -235,6 +242,7 @@ public class BaseObjectSerializerV2
     foreach ((PropertyInfo propertyInfo, PropertyAttributeInfo detachInfo) in typedProperties)
     {
       object baseValue = propertyInfo.GetValue(baseObj);
+
       allProperties[propertyInfo.Name] = (baseValue, detachInfo);
     }
 
@@ -300,7 +308,16 @@ public class BaseObjectSerializerV2
       string json = Dict2Json(convertedBase);
       string id = (string)convertedBase["id"]!;
       StoreObject(id, json);
-      ObjectReference objRef = new() { referencedId = id };
+      ObjectReference objRef = new() { referencedId = id }; // __closure = convertedBase["__closure"] as Dictionary<string,int> };
+      if (convertedBase.ContainsKey("__closure") && convertedBase["applicationId"] is not null)
+      {
+        objRef.__closure = convertedBase["__closure"] as Dictionary<string, int>;
+        _ids[convertedBase["applicationId"] as string] = objRef;
+      }
+      // if (convertedBase["applicationId"] is not null)
+      // {
+      //   _ids[convertedBase["applicationId"] as string] = objRef;
+      // }
       var objRefConverted = (IDictionary<string, object?>?)PreserializeObject(objRef);
       UpdateParentClosures(id);
       _onProgressAction?.Invoke("S", 1);

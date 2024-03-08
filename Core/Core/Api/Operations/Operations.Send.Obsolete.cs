@@ -25,7 +25,7 @@ public static partial class Operations
                                             This function will be kept around for several releases, but will eventually be removed.
                                             """;
 
-  ///<inheritdoc cref="Send(Speckle.Core.Models.Base,System.Threading.CancellationToken,System.Collections.Generic.List{Speckle.Core.Transports.ITransport}?,bool,System.Action{System.Collections.Concurrent.ConcurrentDictionary{string,int}}?,System.Action{string,System.Exception}?,bool,Speckle.Core.Api.SerializerVersion)"/>
+  /*///<inheritdoc cref="Send(Speckle.Core.Models.Base,System.Threading.CancellationToken,System.Collections.Generic.List{Speckle.Core.Transports.ITransport}?,bool,System.Action{System.Collections.Concurrent.ConcurrentDictionary{string,int}}?,System.Action{string,System.Exception}?,bool,Speckle.Core.Api.SerializerVersion)"/>
   [Obsolete("This overload has been deprecated along with serializer v1. Use other Send overloads instead.")]
   [SuppressMessage("Naming", "CA1720:Identifier contains type name")]
   public static Task<string> Send(Base @object) => Send(@object, CancellationToken.None);
@@ -82,6 +82,7 @@ public static partial class Operations
     bool disposeTransports,
     SerializerVersion serializerVersion = SerializerVersion.V2
   ) => Send(@object, CancellationToken.None, null, true, null, null, disposeTransports, serializerVersion);
+  */
 
   /// <summary>
   /// Sends an object via the provided transports. Defaults to the local cache.
@@ -111,7 +112,7 @@ public static partial class Operations
   /// <returns>The id (hash) of the object.</returns>
   [SuppressMessage("Naming", "CA1720:Identifier contains type name")]
   [Obsolete(DEPRECATION_NOTICE)]
-  public static async Task<string> Send(
+  public static async Task<Tuple<string, Dictionary<string, ObjectReference>>> Send(
     Base @object,
     CancellationToken cancellationToken,
     List<ITransport>? transports = null,
@@ -174,6 +175,7 @@ public static partial class Operations
 
       string obj;
       List<Task> transportAwaits;
+      var ids = new Dictionary<string, ObjectReference>();
       if (serializerVersion == SerializerVersion.V1)
       {
         obj = JsonConvert.SerializeObject(@object, settings);
@@ -182,6 +184,7 @@ public static partial class Operations
       else
       {
         obj = serializerV2!.Serialize(@object);
+        ids = serializerV2._ids;
         transportAwaits = serializerV2.WriteTransports.Select(t => t.WriteComplete()).ToList();
       }
 
@@ -235,7 +238,7 @@ public static partial class Operations
           sendTimer.Elapsed.TotalSeconds,
           hash
         );
-      return hash;
+      return new Tuple<string, Dictionary<string, ObjectReference>>(hash, ids);
     }
   }
 }

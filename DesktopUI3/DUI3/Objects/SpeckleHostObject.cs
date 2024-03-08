@@ -7,12 +7,12 @@
 //Map conversion result to SpeckleHostObject
 
 // result of a ToNative conversion...
-public abstract class SpeckleHostObject<T> : ISpeckleHostObject
+public abstract record SpeckleHostObject<T> : ISpeckleHostObject
 {
   public virtual T NativeObject { get; }
   public string ApplicationId { get; }
   public string SpeckleId { get; }
-  public bool IsExpired { get; }
+  public bool IsExpired { get; protected set; }
 
   public abstract SpeckleHostObject<T> WithExpiredStatus(bool status = true);
 }

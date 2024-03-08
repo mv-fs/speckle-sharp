@@ -44,5 +44,5 @@ public class Collection : Base
   /// This can include additional nested <see cref="Collection"/>s.
   /// </remarks>
   [DetachProperty]
-  public List<Base> elements { get; set; } = new();
+  public List<object> elements { get; set; } = new();
 }
