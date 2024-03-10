@@ -68,6 +68,15 @@ public class ObjectReference
   public Dictionary<string, int> __closure { get; set; }
 }
 
+public class CachedObjectReference
+{
+  public string speckle_type = "reference";
+
+  public string referencedId { get; set; }
+
+  public Dictionary<string, int> __closure { get; set; }
+}
+
 public class ProgressEventArgs : EventArgs
 {
   public ProgressEventArgs(int current, int total, string scope)

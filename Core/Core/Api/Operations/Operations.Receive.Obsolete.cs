@@ -20,7 +20,8 @@ namespace Speckle.Core.Api;
 public enum SerializerVersion
 {
   V1,
-  V2
+  V2,
+  V3
 }
 
 public static partial class Operations

@@ -31,7 +31,7 @@ public class SendBinding : ISendBinding, ICancelable
 
   private HashSet<string> ChangedObjectIds { get; set; } = new();
 
-  private Dictionary<string, ObjectReference> SentObjects = new();
+  private Dictionary<string, CachedObjectReference> SentObjects = new();
 
   public SendBinding(DocumentModelStore store)
   {
@@ -151,8 +151,8 @@ public class SendBinding : ISendBinding, ICancelable
         new ModelCardProgress { Status = "Uploading..." }
       );
 
-      Tuple<string, Dictionary<string, ObjectReference>> commitIdAndObjects = await Speckle.Core.Api.Operations
-        .Send(commitObject, cts.Token, transports, disposeTransports: true)
+      Tuple<string, Dictionary<string, CachedObjectReference>> commitIdAndObjects = await Speckle.Core.Api.Operations
+        .Send(commitObject, cts.Token, transports, disposeTransports: true, serializerVersion: SerializerVersion.V3)
         .ConfigureAwait(true);
       foreach (var objs in commitIdAndObjects.Item2)
       {
@@ -229,7 +229,7 @@ public class SendBinding : ISendBinding, ICancelable
       // 2. get or create a nested collection for it
       var collectionHost = GetAndCreateObjectHostCollection(layerCollectionCache, layer, modelWithLayers);
       if (
-        SentObjects.TryGetValue(rhinoObject.Id.ToString(), out ObjectReference reference)
+        SentObjects.TryGetValue(rhinoObject.Id.ToString(), out CachedObjectReference reference)
         && !ChangedObjectIds.Contains(rhinoObject.Id.ToString())
       )
       {

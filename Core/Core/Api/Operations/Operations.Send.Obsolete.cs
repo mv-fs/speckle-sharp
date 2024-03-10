@@ -112,7 +112,7 @@ public static partial class Operations
   /// <returns>The id (hash) of the object.</returns>
   [SuppressMessage("Naming", "CA1720:Identifier contains type name")]
   [Obsolete(DEPRECATION_NOTICE)]
-  public static async Task<Tuple<string, Dictionary<string, ObjectReference>>> Send(
+  public static async Task<Tuple<string, Dictionary<string, CachedObjectReference>>> Send(
     Base @object,
     CancellationToken cancellationToken,
     List<ITransport>? transports = null,
@@ -153,6 +153,7 @@ public static partial class Operations
       BaseObjectSerializer? serializer = null;
       JsonSerializerSettings? settings = null;
       BaseObjectSerializerV2? serializerV2 = null;
+      BaseObjectSerializerV3? serializerV3 = null;
       if (serializerVersion == SerializerVersion.V1)
       {
         (serializer, settings) = GetSerializerInstance();
@@ -160,6 +161,10 @@ public static partial class Operations
         serializer!.OnProgressAction = internalProgressAction;
         serializer.CancellationToken = cancellationToken;
         serializer.OnErrorAction = onErrorAction;
+      }
+      else if (serializerVersion == SerializerVersion.V3)
+      {
+        serializerV3 = new BaseObjectSerializerV3(transports, internalProgressAction, cancellationToken);
       }
       else
       {
@@ -175,16 +180,21 @@ public static partial class Operations
 
       string obj;
       List<Task> transportAwaits;
-      var ids = new Dictionary<string, ObjectReference>();
+      var ids = new Dictionary<string, CachedObjectReference>();
       if (serializerVersion == SerializerVersion.V1)
       {
         obj = JsonConvert.SerializeObject(@object, settings);
         transportAwaits = serializer!.WriteTransports.Select(t => t.WriteComplete()).ToList();
       }
+      else if (serializerVersion == SerializerVersion.V3)
+      {
+        obj = serializerV3!.Serialize(@object);
+        ids = serializerV3._ids;
+        transportAwaits = serializerV3.WriteTransports.Select(t => t.WriteComplete()).ToList();
+      }
       else
       {
         obj = serializerV2!.Serialize(@object);
-        ids = serializerV2._ids;
         transportAwaits = serializerV2.WriteTransports.Select(t => t.WriteComplete()).ToList();
       }
 
@@ -238,7 +248,7 @@ public static partial class Operations
           sendTimer.Elapsed.TotalSeconds,
           hash
         );
-      return new Tuple<string, Dictionary<string, ObjectReference>>(hash, ids);
+      return new Tuple<string, Dictionary<string, CachedObjectReference>>(hash, ids);
     }
   }
 }

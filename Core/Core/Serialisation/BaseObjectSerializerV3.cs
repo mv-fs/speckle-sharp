@@ -17,12 +17,12 @@ using Utilities = Speckle.Core.Models.Utilities;
 
 namespace Speckle.Core.Serialisation;
 
-public class BaseObjectSerializerV2
+public class BaseObjectSerializerV3
 {
   private readonly Stopwatch _stopwatch = new();
   private volatile bool _isBusy;
   private List<Dictionary<string, int>> _parentClosures = new();
-  public readonly Dictionary<string, ObjectReference> _ids = new();
+  public readonly Dictionary<string, CachedObjectReference> _ids = new();
   private HashSet<object> _parentObjects = new();
   private readonly Dictionary<string, List<(PropertyInfo, PropertyAttributeInfo)>> _typedPropertiesCache = new();
   private readonly Action<string, int>? _onProgressAction;
@@ -35,10 +35,10 @@ public class BaseObjectSerializerV2
   /// <summary>The current total elapsed time spent serializing</summary>
   public TimeSpan Elapsed => _stopwatch.Elapsed;
 
-  public BaseObjectSerializerV2()
+  public BaseObjectSerializerV3()
     : this(Array.Empty<ITransport>()) { }
 
-  public BaseObjectSerializerV2(
+  public BaseObjectSerializerV3(
     IReadOnlyCollection<ITransport> writeTransports,
     Action<string, int>? onProgressAction = null,
     CancellationToken cancellationToken = default
@@ -111,14 +111,19 @@ public class BaseObjectSerializerV2
     }
 
     // WIP: ! Here somehow we broke first sent closures
-    if (obj is ObjectReference reff)
+    if (obj is CachedObjectReference reff)
     {
-      var lastPC = _parentClosures[_parentClosures.Count - 1];
+      // var lastPC = _parentClosures[_parentClosures.Count - 1];
       if (reff.__closure is not null)
-        foreach (var VARIABLE in reff.__closure)
+      {
+        foreach (var parentClosure in _parentClosures)
         {
-          lastPC[VARIABLE.Key] = VARIABLE.Value;
+          foreach (var kv in reff.__closure)
+          {
+            parentClosure[kv.Key] = kv.Value;
+          }
         }
+      }
     }
 
     switch (obj)
@@ -154,6 +159,17 @@ public class BaseObjectSerializerV2
         return ret;
       }
       case ObjectReference r:
+      {
+        Dictionary<string, object> ret =
+          new()
+          {
+            ["speckle_type"] = r.speckle_type,
+            ["referencedId"] = r.referencedId,
+            ["__closure"] = r.__closure
+          };
+        return ret;
+      }
+      case CachedObjectReference r:
       {
         Dictionary<string, object> ret =
           new()
@@ -320,16 +336,17 @@ public class BaseObjectSerializerV2
       string id = (string)convertedBase["id"]!;
       StoreObject(id, json);
       ObjectReference objRef = new() { referencedId = id };
+      var objRefConverted = (IDictionary<string, object?>?)PreserializeObject(objRef);
+      UpdateParentClosures(id);
 
       // WIP: !
       if (convertedBase.ContainsKey("__closure") && convertedBase["applicationId"] is not null)
       {
-        objRef.__closure = convertedBase["__closure"] as Dictionary<string, int>;
-        _ids[convertedBase["applicationId"] as string] = objRef;
+        CachedObjectReference cachedObjectReference =
+          new() { referencedId = id, __closure = convertedBase["__closure"] as Dictionary<string, int> };
+        // objRef.__closure = convertedBase["__closure"] ;
+        _ids[convertedBase["applicationId"] as string] = cachedObjectReference;
       }
-
-      var objRefConverted = (IDictionary<string, object?>?)PreserializeObject(objRef);
-      UpdateParentClosures(id);
       _onProgressAction?.Invoke("S", 1);
       return objRefConverted;
     }
