@@ -154,9 +154,12 @@ public class SendBinding : ISendBinding, ICancelable
       // Store the converted references in memory for future send operations, overwriting the existing values for the given application id.
       foreach (var kvp in sendResult.convertedReferences)
       {
-        _convertedObjectReferences[kvp.Key] = kvp.Value;
+        // TODO: Bug in here, we need to encapsulate cache not only by app id, but also by project id,
+        // TODO: as otherwise we assume incorrectly that an object exists for a given project (e.g, send box to project 1, send same unchanged box to project 2) 
+        _convertedObjectReferences[kvp.Key + modelCard.ProjectId] = kvp.Value;
       }
       // It's important to reset the model card's list of changed obj ids so as to ensure we accurately keep track of changes between send operations.
+      // NOTE: ChangedObjectIds is currently JsonIgnored, but could actually be useful for highlighting changes in host app.
       modelCard.ChangedObjectIds = new();
       
       BasicConnectorBindingCommands.SetModelProgress(Parent, modelCardId, new ModelCardProgress { Status = "Linking version to model..." });
@@ -188,7 +191,7 @@ public class SendBinding : ISendBinding, ICancelable
   
   private Base ConvertObjects(List<RhinoObject> rhinoObjects, ISpeckleConverter converter, SenderModelCard modelCard, CancellationTokenSource cts)
   {
-    var rootObjectCollection = new Collection { name = RhinoDoc.ActiveDoc.Name };
+    var rootObjectCollection = new Collection { name = RhinoDoc.ActiveDoc.Name ?? "Unnamed document" };
     int count = 0;
     
     Dictionary<int, Collection> layerCollectionCache = new();
@@ -212,7 +215,7 @@ public class SendBinding : ISendBinding, ICancelable
       // What we actually do here is check if the object has been previously converted AND has not changed.
       // If that's the case, we insert in the host collection just its object reference which has been saved from the prior conversion. 
       Base converted;
-      if (!modelCard.ChangedObjectIds.Contains(applicationId) && _convertedObjectReferences.TryGetValue(applicationId, out ObjectReference value))
+      if (!modelCard.ChangedObjectIds.Contains(applicationId) && _convertedObjectReferences.TryGetValue(applicationId + modelCard.ProjectId, out ObjectReference value))
       {
         converted = value;
       }
