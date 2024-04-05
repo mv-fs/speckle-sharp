@@ -5,8 +5,7 @@ using Speckle.Core.Models;
 
 namespace Speckle.Converters.Autocad.Geometry;
 
-[NameAndRankValue(nameof(AG.Plane), NameAndRankValueAttribute.SPECKLE_DEFAULT_RANK)]
-public class PlaneToSpeckleConverter : IHostObjectToSpeckleConversion, IRawConversion<AG.Plane, SOG.Plane>
+public class PlaneToSpeckleConverter : IRawConversion<AG.Plane, SOG.Plane>
 {
   private readonly IRawConversion<AG.Vector3d, SOG.Vector> _vectorConverter;
   private readonly IRawConversion<AG.Point3d, SOG.Point> _pointConverter;

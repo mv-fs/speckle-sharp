@@ -5,8 +5,7 @@ using Speckle.Core.Models;
 
 namespace Speckle.Converters.Autocad.Geometry;
 
-[Common.NameAndRankValue(nameof(AG.Vector3d), NameAndRankValueAttribute.SPECKLE_DEFAULT_RANK)]
-public class VectorToSpeckleConverter : IHostObjectToSpeckleConversion, IRawConversion<AG.Vector3d, SOG.Vector>
+public class VectorToSpeckleConverter : IRawConversion<AG.Vector3d, SOG.Vector>
 {
   private readonly IConversionContextStack<Document, UnitsValue> _contextStack;
 

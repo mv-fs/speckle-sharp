@@ -9,15 +9,10 @@ namespace Speckle.Converters.Autocad.Geometry;
 public class DBPointToSpeckleConverter : IHostObjectToSpeckleConversion, IRawConversion<DBPoint, SOG.Point>
 {
   private readonly IRawConversion<AG.Point3d, SOG.Point> _pointConverter;
-  private readonly IConversionContextStack<Document, UnitsValue> _contextStack;
 
-  public DBPointToSpeckleConverter(
-    IRawConversion<AG.Point3d, SOG.Point> pointConverter,
-    IConversionContextStack<Document, UnitsValue> contextStack
-  )
+  public DBPointToSpeckleConverter(IRawConversion<AG.Point3d, SOG.Point> pointConverter)
   {
     _pointConverter = pointConverter;
-    _contextStack = contextStack;
   }
 
   public Base Convert(object target) => RawConvert((DBPoint)target);

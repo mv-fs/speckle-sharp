@@ -6,13 +6,13 @@ using Speckle.Core.Models;
 namespace Speckle.Converters.Autocad.Geometry;
 
 [NameAndRankValue(nameof(ADB.Line), NameAndRankValueAttribute.SPECKLE_DEFAULT_RANK)]
-public class LineToSpeckleConverter : IHostObjectToSpeckleConversion, IRawConversion<ADB.Line, SOG.Line>
+public class DBLineToSpeckleConverter : IHostObjectToSpeckleConversion, IRawConversion<ADB.Line, SOG.Line>
 {
   private readonly IRawConversion<AG.Point3d, SOG.Point> _pointConverter;
   private readonly IRawConversion<Extents3d, SOG.Box> _boxConverter;
   private readonly IConversionContextStack<Document, UnitsValue> _contextStack;
 
-  public LineToSpeckleConverter(
+  public DBLineToSpeckleConverter(
     IRawConversion<AG.Point3d, SOG.Point> pointConverter,
     IRawConversion<Extents3d, SOG.Box> boxConverter,
     IConversionContextStack<Document, UnitsValue> contextStack
