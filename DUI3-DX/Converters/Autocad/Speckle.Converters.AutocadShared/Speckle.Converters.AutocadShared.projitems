@@ -16,10 +16,17 @@
     <Compile Include="$(MSBuildThisFileDirectory)DependencyInjection\AutofacAutocadConverterModule.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\BoxToSpeckleConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\IntervalToSpeckleConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Geometry\ArcToHostConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)geometry\LineToHostConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Geometry\ArcToSpeckleConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Geometry\PolylineToHostConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Geometry\PolylineToSpeckleConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\LineToSpeckleConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Geometry\PlaneToHostConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\PlaneToSpeckleConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\PointToHostConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\PointToSpeckleConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Geometry\VectorToHostConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\VectorToSpeckleConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GlobalUsings.cs" />
   </ItemGroup>
