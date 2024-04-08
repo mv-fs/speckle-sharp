@@ -20,6 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)geometry\LineToHostConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\ArcToSpeckleConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\PolylineToHostConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Geometry\MeshToSpeckleConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\PolylineToSpeckleConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\LineToSpeckleConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\PlaneToHostConverter.cs" />
