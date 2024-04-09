@@ -15,10 +15,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)AutocadToSpeckleUnitConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DependencyInjection\AutofacAutocadConverterModule.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\BoxToSpeckleConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Geometry\EllipseToHostConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\CircleToHostConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Geometry\EllipseToSpeckleConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\CircleToSpeckleConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\IntervalToSpeckleConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\ArcToHostConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Geometry\MeshToHostConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)geometry\LineToHostConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\ArcToSpeckleConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Geometry\PolylineToHostConverter.cs" />

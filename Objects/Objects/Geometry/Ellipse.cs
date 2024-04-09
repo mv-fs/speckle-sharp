@@ -55,12 +55,12 @@ public class Ellipse : Base, ICurve, IHasArea
   /// <summary>
   /// Gets or sets the first radius of the <see cref="Ellipse"/>. This is usually the major radius.
   /// </summary>
-  public double? firstRadius { get; set; }
+  public double firstRadius { get; set; }
 
   /// <summary>
   /// Gets or sets the second radius of the <see cref="Ellipse"/>. This is usually the minor radius.
   /// </summary>
-  public double? secondRadius { get; set; }
+  public double secondRadius { get; set; }
 
   /// <summary>
   /// Gets or sets the plane to draw this ellipse in.
@@ -93,8 +93,8 @@ public class Ellipse : Base, ICurve, IHasArea
   public List<double> ToList()
   {
     var list = new List<double>();
-    list.Add(firstRadius ?? 0);
-    list.Add(secondRadius ?? 0);
+    list.Add(firstRadius);
+    list.Add(secondRadius);
     list.Add(domain?.start ?? 0);
     list.Add(domain?.end ?? 0);
 

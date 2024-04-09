@@ -1,4 +1,5 @@
-﻿using Speckle.Converters.Common;
+using Objects.Structural.Analysis;
+using Speckle.Converters.Common;
 using Speckle.Converters.Common.Objects;
 using Speckle.Core.Models;
 
@@ -28,7 +29,9 @@ public class DBCircleToSpeckleConverter : IHostObjectToSpeckleConversion, IRawCo
   {
     SOG.Plane plane = _planeConverter.RawConvert(target.GetPlane());
     SOG.Box bbox = _boxConverter.RawConvert(target.GeometricExtents);
-    SOG.Circle circle = new(plane, target.Radius, _contextStack.Current.SpeckleUnits) { bbox = bbox };
+    SOG.Circle circle =
+      new(plane, target.Radius, _contextStack.Current.SpeckleUnits) { length = target.Circumference, bbox = bbox };
+
     return circle;
   }
 }
